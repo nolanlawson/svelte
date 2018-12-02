@@ -55,7 +55,8 @@ export function compile(input, opts) {
 		generate: opts.generate || 'dom',
 		customElement: opts.customElement,
 		store: opts.store,
-		shared: opts.shared
+		shared: opts.shared,
+		globalCSS: opts.globalCSS
 	};
 
 	if (isDir) {

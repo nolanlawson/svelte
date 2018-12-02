@@ -242,6 +242,7 @@ export default class Stylesheet {
 	ast: Ast;
 	filename: string;
 	dev: boolean;
+	globalCSS: boolean;
 
 	hasStyles: boolean;
 	id: string;
@@ -252,11 +253,12 @@ export default class Stylesheet {
 	nodesWithCssClass: Set<Node>;
 	nodesWithRefCssClass: Map<String, Node>;
 
-	constructor(source: string, ast: Ast, filename: string, dev: boolean) {
+	constructor(source: string, ast: Ast, filename: string, dev: boolean, globalCSS: boolean) {
 		this.source = source;
 		this.ast = ast;
 		this.filename = filename;
 		this.dev = dev;
+		this.globalCSS = globalCSS;
 
 		this.children = [];
 		this.keyframes = new Map();

@@ -15,7 +15,7 @@ export default class Selector {
 		this.node = node;
 		this.stylesheet = stylesheet;
 
-		this.blocks = groupSelectors(node);
+		this.blocks = groupSelectors(node, stylesheet);
 
 		// take trailing :global(...) selectors out of consideration
 		let i = this.blocks.length;
@@ -278,6 +278,7 @@ function unquote(value: Node) {
 }
 
 class Block {
+	globalCSS: boolean;
 	global: boolean;
 	combinator: Node;
 	selectors: Node[]
@@ -285,9 +286,9 @@ class Block {
 	end: number;
 	shouldEncapsulate: boolean;
 
-	constructor(combinator: Node) {
+	constructor(combinator: Node, globalCSS: boolean) {
 		this.combinator = combinator;
-		this.global = false;
+		this.globalCSS = this.global = globalCSS;
 		this.selectors = [];
 
 		this.start = null;
@@ -299,7 +300,7 @@ class Block {
 	add(selector: Node) {
 		if (this.selectors.length === 0) {
 			this.start = selector.start;
-			this.global = selector.type === 'PseudoClassSelector' && selector.name === 'global';
+			this.global = this.globalCSS || (selector.type === 'PseudoClassSelector' && selector.name === 'global');
 		}
 
 		this.selectors.push(selector);
@@ -307,14 +308,14 @@ class Block {
 	}
 }
 
-function groupSelectors(selector: Node) {
-	let block: Block = new Block(null);
+function groupSelectors(selector: Node, stylesheet: Stylesheet) {
+	let block: Block = new Block(null, stylesheet.globalCSS);
 
 	const blocks = [block];
 
 	selector.children.forEach((child: Node, i: number) => {
 		if (child.type === 'WhiteSpace' || child.type === 'Combinator') {
-			block = new Block(child);
+			block = new Block(child, stylesheet.globalCSS);
 			blocks.push(block);
 		} else {
 			block.add(child);
